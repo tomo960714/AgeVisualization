@@ -1,7 +1,7 @@
 
 
 
-
+*.pbix
 Data/
 AgeDataset-V1.csv
 
@@ -167,3 +167,4 @@ cython_debug/
 #.idea/
 ageDatasetV3(PreProcessed).csv
 heatmap.html
+*.pbix
