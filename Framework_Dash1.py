@@ -1,3 +1,4 @@
+# MAKE YOUR OWN VERSION OF THIS
 import plotly.express as px
 import pandas as pd
 from dash import Dash, dcc, html, Input, Output, ctx
@@ -12,23 +13,9 @@ import numpy as np
 import multi
 
 
-df=pd.read_csv("pre_ages_loc.csv")
+df=pd.read_csv("pre_ages_loc.csv")  # INSERT NEWEST VERSION OF DATASET - AT LEAST V4
 df.head(6)
 
-df['AssociatedModernCountry'] = df['AssociatedModernCountry'].apply(lambda x: x.strip("[]'"))
-df['AssociatedModernCountry'] = df['AssociatedModernCountry'].str.replace('"', "")
-
-
-replacements = {
-    'Czechia': 'Czech Republic',
-    'United States': 'United States of America',
-    "Côte d'Ivoire": 'Ivory Coast',
-    'Tanzania': 'United Republic of Tanzania',
-    'Serbia': 'Republic of Serbia',
-    'North Macedonia': 'Macedonia'  # I know this is incorrect but the GEOjson was made earlier than 2019
-}
-
-df['AssociatedModernCountry'] = df['AssociatedModernCountry'].replace(replacements)
 
 # Adding interaction with a lineplot - removing and adding countries
 
