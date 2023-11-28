@@ -32,6 +32,8 @@ df['AssociatedModernCountry'] = df['AssociatedModernCountry'].replace(replacemen
 
 # Adding interaction with a lineplot - removing and adding countries
 
+# Adding interaction with a lineplot - removing and adding countries
+
 import pandas as pd
 import plotly.express as px
 import dash
@@ -48,8 +50,8 @@ app = dash.Dash(__name__)
 # Define the app layout
 app.layout = html.Div([
     html.Div([
-        dcc.Graph(id='choropleth-map', style={'width': '70%', 'display': 'inline-block'}),
-        dcc.Graph(id='bar-plot', style={'width': '30%', 'display': 'inline-block'})
+        dcc.Graph(id='choropleth-map', style={'width': '65%', 'display': 'inline-block'}),
+        dcc.Graph(id='sunburst', style={'width': '35%', 'display': 'inline-block'})
     ]),
     html.Div([
         html.Button('1917-1921', id='button-1', n_clicks=0),
@@ -85,7 +87,7 @@ def update_slider(button_1, button_2, button_3):
     else:
         return [df['Birth year'].min(), df['Birth year'].max()]
 
-# Callback to update the choropleth map based on slider and button clicks
+# callback to update the choropleth map based on slider and button clicks
 @app.callback(
     Output('choropleth-map', 'figure'),
     [Input('year-slider', 'value')]
@@ -96,11 +98,11 @@ def update_map(year_range):
     # do we want hard borders or just who was alive in this period?
     filtered_df = df[(df['Birth year'] <= year_range[1]) & (df['Death year'] >= year_range[0])]
     
-        # Count the number of observations per country
+        # count the number of observations per country
     country_counts = filtered_df['AssociatedModernCountry'].value_counts().reset_index()
     country_counts.columns = ['AssociatedModernCountry', 'Observation_Count']
 
-    # Merge counts back into the original DataFrame
+    # merging counts back into the original DataFrame
     filtered_df = pd.merge(filtered_df, country_counts, on='AssociatedModernCountry')
     
     # working with latitude and longitude
@@ -112,39 +114,75 @@ def update_map(year_range):
     return fig
 
 selected_countries = []
+# @app.callback(
+#     Output('bar-plot', 'figure'),
+#     [Input('choropleth-map', 'clickData'),
+#      Input('year-slider', 'value')]
+# )
+# def update_bar_plot(clickData, year_range):  # error when bar plot becomes empy
+#     if clickData is not None:
+#         clicked_country = clickData['points'][0]['location']
+        
+#         if clicked_country in selected_countries:
+#             selected_countries.remove(clicked_country)
+#         else:
+#             selected_countries.append(clicked_country)
+#         # print(selected_countries)
+
+#         # Filter data for the clicked country and the selected year range
+#         filtered_df = df[(df['AssociatedModernCountry'].isin(selected_countries)) & 
+#                          (df['Birth year'] <= year_range[1]) & 
+#                          (df['Death year'] >= year_range[0])]
+
+#         # Calculate population or any relevant data for the bar plot
+#         # Example assuming 'Population' column exists
+#         country_counts = filtered_df['AssociatedModernCountry'].value_counts().reset_index()
+#         country_counts.columns = ['AssociatedModernCountry', 'Observation_Count']
+#         # print(country_counts)
+
+#         # Create bar plot for population
+#         fig = px.bar(x=country_counts['AssociatedModernCountry'], y=country_counts['Observation_Count'], labels={'x': 'Country', 'y': 'Population'})
+#         fig.update_layout(title=f'Population of {clicked_country}')
+#         return fig
+
+#     # If no country is clicked, return an empty figure
+#     return {}
+
+selected_countries = []    
 @app.callback(
-    Output('bar-plot', 'figure'),
+    Output('sunburst', 'figure'),
     [Input('choropleth-map', 'clickData'),
      Input('year-slider', 'value')]
 )
-def update_bar_plot(clickData, year_range):  # error when bar plot becomes empy
-    if clickData is not None:
-        clicked_country = clickData['points'][0]['location']
+def update_sunburst(clickData, year_range):
+    
+#     if clickData is not None:
+#         clicked_country = clickData['points'][0]['location']
         
-        if clicked_country in selected_countries:
-            selected_countries.remove(clicked_country)
-        else:
-            selected_countries.append(clicked_country)
-        # print(selected_countries)
+#         if clicked_country in selected_countries:
+#             selected_countries.remove(clicked_country)
+#         else:
+#             selected_countries.append(clicked_country)
+#         # print(selected_countries)
 
-        # Filter data for the clicked country and the selected year range
-        filtered_df = df[(df['AssociatedModernCountry'].isin(selected_countries)) & 
-                         (df['Birth year'] <= year_range[1]) & 
-                         (df['Death year'] >= year_range[0])]
+#             # Filter data for the clicked country and the selected year range
+#         filtered_df = df[(df['AssociatedModernCountry'].isin(selected_countries)) & 
+#                          (df['Birth year'] <= year_range[1]) & 
+#                          (df['Death year'] >= year_range[0])]
+#         occupation_data = filtered_df[['Occupation', 'Gender', 'Name']]
 
-        # Calculate population or any relevant data for the bar plot
-        # Example assuming 'Population' column exists
-        country_counts = filtered_df['AssociatedModernCountry'].value_counts().reset_index()
-        country_counts.columns = ['AssociatedModernCountry', 'Observation_Count']
-        # print(country_counts)
-
-        # Create bar plot for population
-        fig = px.bar(x=country_counts['AssociatedModernCountry'], y=country_counts['Observation_Count'], labels={'x': 'Country', 'y': 'Population'})
-        fig.update_layout(title=f'Population of {clicked_country}')
-        return fig
-
-    # If no country is clicked, return an empty figure
-    return {}
+#     else:
+    occupation_data = df[['Occupation', 'Gender', 'Name']]
+    # Create the sunburst chart for Occupation
+    fig = px.sunburst(
+        occupation_data,
+        path=['Occupation', 'Gender'],
+        title="Occupation Distribution by Gender",
+        width=800,
+        height=800
+    )
+    return fig
+    
 
 # Run the app
 # app.run_server(mode='external', port = 8090, dev_tools_ui=True, #debug=True,
