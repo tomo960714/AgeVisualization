@@ -46,6 +46,7 @@ with open('countries.geojson', 'r') as f:
 app = dash.Dash(__name__)
 
 
+#### Country ####
 # sort unique associated modern country
 unique_country = df['AssociatedModernCountry'].unique()
 unique_country.sort()
@@ -63,33 +64,65 @@ continents_countries = {continent: sorted(countries) for continent, countries in
 # add to list together
 country_list = sorted(world['continent'].unique().tolist()) + unique_country.tolist() 
 
-# get unique uccupaion list
+#### Occupation ####
+# get unique Occupaion list
 unique_occupation = df['Occupation'].unique()
 unique_occupation.sort()
 
-# %%
-# Define the app layout
-"""app.layout = html.Div([
-    html.Div([
-        dcc.Graph(id='choropleth-map', style={'width': '70%', 'display': 'inline-block'}),
-        dcc.Graph(id='bar-plot', style={'width': '30%', 'display': 'inline-block'})
-    ]),
-    html.Div([
-        html.Button('1917-1921', id='button-1', n_clicks=0),
-        html.Button('1939-1945', id='button-2', n_clicks=0),
-        html.Button('1980-1985', id='button-3', n_clicks=0),
-        dcc.RangeSlider(
-            id='year-slider',
-            min=-1000,
-            max=2021,
-            value=[-1000, 2021],
-            marks={str(year): str(year) for year in range(-1000, 2021, 200)},
-            step=None
-        ),
-        dcc.Graph(id='line-plot')  # New line plot graph component
-    ], style={'width': '100%', 'margin': 'auto'})
-])"""
+#### Gender ####
+# get gender list
+gender_list = df['Gender'].unique()
+gender_list.sort()
+print(type(gender_list))
+gender_list.tolist()
+print(type(gender_list))
 
+# add "all" to gender list
+gender_list.insert(0, 'All')
+
+filters =html.Div([
+    html.H2("Filters"),
+    html.Hr(),
+    #dbc.Button(id='gender-button', n_clicks=0, children='Both'),
+    # add dropdown gender instead of button
+    html.P("Select gender"),
+    dcc.Dropdown(
+        options=
+        [{'label':gender,'value': gender} for gender in gender_list],
+        multi = True,
+        id = 'dropdown-gender',
+        placeholder="Select options...",
+        style={'width': '100%'}
+    ),
+    html.Div(id='output-div-gender'),
+    #html.Div(id='current-state-div', style={'margin-top': '10px'}),
+    html.Hr(),
+    html.P("Select the countries you want to compare"),
+    dcc.Dropdown(
+        # add continents from continents_countries and unique countries to the dropdown
+        options=
+            [{'label': continent, 'value': continent} for continent in country_list],
+        multi=True,
+        id='dropdown-checklist',
+        placeholder="Select options...",
+        style={'width': '100%'}
+    ),
+    html.Div(id='output-country-div'),
+    html.Hr(),
+    html.P("Select the occupation you want to compare"),
+    # occupation dropdown
+    dcc.Dropdown(
+        options=
+            [{'label': occupation, 'value': occupation} for occupation in unique_occupation],
+        multi=True,
+        id='dropdown-checklist-occupation',
+        placeholder="Select options...",
+        style={'width': '100%'}
+        ),
+    html.Div(id='output-div-occupation'),
+    html.Hr(),
+                        
+    ], style={'width': '100%', 'margin': 'auto'})
 
 #generate the same app layout but with Bootstrap CSS and add a widget on the right so I can put my filters there in the future
 app.layout = dbc.Container([
@@ -122,40 +155,8 @@ app.layout = dbc.Container([
 
         dbc.Col([
             dbc.Row([
-                dbc.Col([
-                    html.Div([
-                        html.H2("Filters"),
-                        html.Hr(),
-                        dbc.Button(id='gender-button', n_clicks=0, children='Both'),
-                        html.Div(id='output-div-gender'),
-                        html.Div(id='current-state-div', style={'margin-top': '10px'}),
-                        html.Hr(),
-                        html.P("Select the countries you want to compare"),
-                        dcc.Dropdown(
-                            # add continents from continents_countries and unique countries to the dropdown
-                            options=
-                                [{'label': continent, 'value': continent} for continent in country_list],
-                            multi=True,
-                            id='dropdown-checklist',
-                            placeholder="Select options...",
-                            style={'width': '100%'}
-                        ),
-                        html.Div(id='output-country-div'),
-                        html.Hr(),
-                        html.P("Select the occupation you want to compare"),
-                        # occupation dropdown
-                        dcc.Dropdown(
-                            options=
-                                [{'label': occupation, 'value': occupation} for occupation in unique_occupation],
-                            multi=True,
-                            id='dropdown-checklist-occupation',
-                            placeholder="Select options...",
-                            style={'width': '100%'}
-                        ),
-                        html.Div(id='output-div-occupation'),
-                        html.Hr(),
-                        
-                    ], style={'width': '100%', 'margin': 'auto'})
+                dbc.Col([filters
+
 
                 ], style={'width': '100%', 'margin': 'auto'})
             ], style={'width': '100%', 'margin': 'auto'}),
@@ -164,11 +165,10 @@ app.layout = dbc.Container([
     ], style={'width': '100%', 'margin': 'auto'}, fluid=True)
 
 
-# callback for country dropdown checklist
-
+# callback for country dropdown checklist 
 @app.callback(
     Output('output-country-div', 'children'),
-    Input('dropdown-checklist', 'value')
+    #Input('dropdown-checklist', 'value')
 )
 def update_country_list(selected_options):
     if selected_options:
@@ -188,7 +188,8 @@ def update_country_list(selected_options):
         selected_options = list(set(selected_options))
         # sort selected options
         selected_options.sort()
-        return f'Selected options: {", ".join(selected_options)}'
+        #return f'Selected options: {", ".join(selected_options)}'
+        return selected_options
     else:
         return 'No options selected'
 
@@ -204,36 +205,15 @@ def update_occupation_list(selected_options):
         selected_options = list(set(selected_options))
         # sort selected options
         selected_options.sort()
-        return f'Selected options: {", ".join(selected_options)}'
+        #return f'Selected options: {", ".join(selected_options)}'
+        return selected_options
     else:
         return 'No options selected'
 
+# gender callback
 @app.callback(
-    [Output('gender-button', 'children'),
-     Output('output-div-gender', 'children'),
-     Output('current-state-div', 'children')],
-    [Input('gender-button', 'n_clicks')],
-    [State('gender-button', 'children')],
-    prevent_initial_call=True
+    Output('output-gender-div', 'children'),
 )
-def update_button_state(n_clicks, current_label):
-    new_label = None
-    output_message = ''
-
-    if current_label == 'Male':
-        new_label = 'Female'
-        output_message = 'Selected gender: Male'
-    elif current_label == 'Female':
-        new_label = 'Both'
-        output_message = 'Selected gender: Female'
-    elif current_label == 'Both':
-        new_label = 'Male'
-        output_message = 'Selected gender: Both'
-
-    current_state_message = f'Current state: {current_label}'
-
-    return new_label, output_message, current_state_message
-
 
 @app.callback(
     Output('year-slider', 'value'),
