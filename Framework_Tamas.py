@@ -46,6 +46,7 @@ with open('countries.geojson', 'r') as f:
 app = dash.Dash(__name__)
 
 
+#From{
 #### Country ####
 # sort unique associated modern country
 unique_country = df['AssociatedModernCountry'].unique()
@@ -71,14 +72,11 @@ unique_occupation.sort()
 
 #### Gender ####
 # get gender list
-gender_list = df['Gender'].unique()
-gender_list.sort()
-print(type(gender_list))
-gender_list.tolist()
-print(type(gender_list))
+gender_list = sorted(df['Gender'].unique().tolist())
+# add 'all' to the gender_list
+gender_list.append('All')
 
-# add "all" to gender list
-gender_list.insert(0, 'All')
+
 
 filters =html.Div([
     html.H2("Filters"),
@@ -124,6 +122,7 @@ filters =html.Div([
                         
     ], style={'width': '100%', 'margin': 'auto'})
 
+#}to here
 #generate the same app layout but with Bootstrap CSS and add a widget on the right so I can put my filters there in the future
 app.layout = dbc.Container([
     dbc.Row([
@@ -164,7 +163,7 @@ app.layout = dbc.Container([
         ]),
     ], style={'width': '100%', 'margin': 'auto'}, fluid=True)
 
-
+#from{
 # callback for country dropdown checklist 
 @app.callback(
     Output('output-country-div', 'children'),
@@ -214,6 +213,7 @@ def update_occupation_list(selected_options):
 @app.callback(
     Output('output-gender-div', 'children'),
 )
+#}to here
 
 @app.callback(
     Output('year-slider', 'value'),
