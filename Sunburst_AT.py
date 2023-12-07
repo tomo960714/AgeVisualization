@@ -51,15 +51,34 @@ with open('countries.geojson', 'r') as f:
 app = dash.Dash(__name__)
 
 # Define the app layout
-app.layout = html.Div([
+app.layout = dbc.Container([
     html.Div([
         dcc.Graph(id='choropleth-map', style={'width': '55%', 'display': 'inline-block'}),
         dcc.Graph(id='sunburst', style={'width': '45%', 'display': 'inline-block'})
     ]),
     html.Div([
-        html.Button('1917-1921', id='button-1', n_clicks=0),
-        html.Button('1939-1945', id='button-2', n_clicks=0),
-        html.Button('1980-1985', id='button-3', n_clicks=0),
+        html.Button('Viking Era', id='button-viking', n_clicks=0),
+        html.Button('Ancient Greece', id='button-greece', n_clicks=0),
+        html.Button('Maurya Empire', id='button-maurya', n_clicks=0),
+        html.Button('Silk Road Establishment', id='button-silk-road', n_clicks=0),
+        html.Button('Roman Empire', id='button-roman', n_clicks=0),
+        html.Button('Great Wall of China', id='button-great-wall', n_clicks=0),
+        html.Button('Mongol Empire', id='button-mongol', n_clicks=0),
+        html.Button('Renaissance', id='button-renaissance', n_clicks=0),
+        html.Button('Age of Exploration', id='button-exploration', n_clicks=0),
+        html.Button('Sengoku Period', id='button-sengoku', n_clicks=0),
+        html.Button('French Revolution', id='button-french-revolution', n_clicks=0),
+        html.Button('Opium Wars', id='button-opium-wars', n_clicks=0),
+        html.Button('Industrial Revolution', id='button-industrial', n_clicks=0),
+        html.Button('Meiji Restoration', id='button-meiji', n_clicks=0),
+        html.Button('Napoleonic Wars', id='button-napoleonic', n_clicks=0),
+        html.Button('American Civil War', id='button-american-civil-war', n_clicks=0),
+        html.Button('World War I', id='button-world-war-i', n_clicks=0),
+        html.Button('Interwar Period', id='button-interwar', n_clicks=0),
+        html.Button('World War II', id='button-world-war-ii', n_clicks=0),
+        html.Button('Korean War', id='button-korean-war', n_clicks=0),
+        html.Button('Cold War', id='button-cold-war', n_clicks=0),
+        html.Button('Digital Age', id='button-digital-age', n_clicks=0),
         dcc.RangeSlider(
             id='year-slider',
             min=-1000,
@@ -72,23 +91,70 @@ app.layout = html.Div([
     ], style={'width': '100%', 'margin': 'auto'})
 ])
 
-
 @app.callback(
     Output('year-slider', 'value'),
-    [Input('button-1', 'n_clicks'),
-     Input('button-2', 'n_clicks'),
-     Input('button-3', 'n_clicks')]
+    [Input('button-viking', 'n_clicks'),
+    Input('button-greece', 'n_clicks'),
+    Input('button-maurya', 'n_clicks'),
+    Input('button-silk-road', 'n_clicks'),
+    Input('button-roman', 'n_clicks'),
+    Input('button-great-wall', 'n_clicks'),
+    Input('button-mongol', 'n_clicks'),
+    Input('button-renaissance', 'n_clicks'),
+    Input('button-exploration', 'n_clicks'),
+    Input('button-sengoku', 'n_clicks'),
+    Input('button-french-revolution', 'n_clicks'),
+    Input('button-opium-wars', 'n_clicks'),
+    Input('button-industrial', 'n_clicks'),
+    Input('button-meiji', 'n_clicks'),
+    Input('button-napoleonic', 'n_clicks'),
+    Input('button-american-civil-war', 'n_clicks'),
+    Input('button-world-war-i', 'n_clicks'),
+    Input('button-interwar', 'n_clicks'),
+    Input('button-world-war-ii', 'n_clicks'),
+    Input('button-korean-war', 'n_clicks'),
+    Input('button-cold-war', 'n_clicks'),
+    Input('button-digital-age', 'n_clicks')
+    ]
 )
-def update_slider(button_1, button_2, button_3):
-    clicked_button_id = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
-    if clicked_button_id == 'button-1':
-        return [1917, 1921]
-    elif clicked_button_id == 'button-2':
-        return [1939, 1945]
-    elif clicked_button_id == 'button-3':
-        return [1980, 1985]
-    else:
-        return [df['Birth year'].min(), df['Birth year'].max()]
+def update_slider(*button_clicks):
+    
+    button_names = [
+        'button-viking', 'button-greece', 'button-maurya', 'button-silk-road', 'button-roman',
+        'button-great-wall', 'button-mongol', 'button-renaissance', 'button-exploration',
+        'button-sengoku', 'button-french-revolution', 'button-opium-wars', 'button-industrial',
+        'button-meiji', 'button-napoleonic', 'button-american-civil-war', 'button-world-war-i',
+        'button-interwar', 'button-world-war-ii', 'button-korean-war', 'button-cold-war',
+        'button-digital-age'
+    ]
+
+    time_periods = [
+        [800, 1100], [-800, 400], [-322, -185], [130, 130], [27, 476],
+        [700, 1700], [1206, 1368], [1300, 1700], [1400, 1700], [1400, 1700],
+        [1789, 1799], [1839, 1860], [1750, 1850], [1868, 1868], [1789, 1815],
+        [1861, 1865], [1914, 1918], [1918, 1939], [1939, 1945], [1950, 1953],
+        [1947, 1991], [1980, 2021]
+    ]
+    clicked_button_id = callback_context.triggered[0]['prop_id'].split('.')[0]
+
+    if clicked_button_id in [
+        'button-viking', 'button-greece', 'button-maurya', 'button-silk-road', 'button-roman',
+        'button-great-wall', 'button-mongol', 'button-renaissance', 'button-exploration',
+        'button-sengoku', 'button-french-revolution', 'button-opium-wars', 'button-industrial',
+        'button-meiji', 'button-napoleonic', 'button-american-civil-war', 'button-world-war-i',
+        'button-interwar', 'button-world-war-ii', 'button-korean-war', 'button-cold-war',
+        'button-digital-age'
+    ]:
+        return time_periods[button_names.index(clicked_button_id)]
+    
+    return [-1000, 2021]  # df['Birth year'].min(), df['Death year'].max()
+
+    #     idx = button_names.index(clicked_button_id)
+    #     print("idx", idx)
+    #     print("periods", time_periods[idx])
+    #     return time_periods[idx]
+    # except ValueError:
+    #     return df['Birth year'].min(), df['Death year'].max()
 
 # Callback to update the choropleth map based on slider and button clicks
 @app.callback(
@@ -100,23 +166,26 @@ def update_map(year_range, clickData):
     # special attention here to birth and death range
     # do we want hard borders or just who was alive in this period?
     filtered_df = df[(df['Birth year'] <= year_range[1]) & (df['Death year'] >= year_range[0])]
+        # {'points': [{'curveNumber': 0, 'pointNumber': 0, 'currentPath': '/Arts and Entertainment/', 
+        #'root': '', 'entry': '', 'percentRoot': 0.2765957446808511, 'percentEntry': 0.2765957446808511, 
+        # 'percentParent': 1, 'parent': 'Arts and Entertainment', 'id': 'Arts and Entertainment/Artist', 
+        #'label': 'Artist', 'value': 13}]} 
     
-    ##===================UPDATED============================================================================
-    if clickData:  
-        print(clickData)
-        clicked_occupation = clickData['points'][0]['label']  # 'label' holds occupation info
-        filtered_df = filtered_df[filtered_df['Occupation'] == clicked_occupation]  # filtering data based on clicked occupation
-     ##===============================================================================================
-
-    
-    
-        # Count the number of observations per country
+##===================UPDATED============================================================================
+    if clickData is not None:
+        clicked_occupation = clickData['points'][0]['label']
+        if (clickData['points'][0]['label'] == clickData['points'][0]['id']) == False:  
+            # print(clickData)
+            filtered_df = filtered_df[filtered_df['Occupation'] == clicked_occupation]  # filtering data based on clicked occupation
+##=====================================================================================================
+        
+            # Count the number of observations per country
     country_counts = filtered_df['AssociatedModernCountry'].value_counts().reset_index()
     country_counts.columns = ['AssociatedModernCountry', 'Observation_Count']
 
     # Merge counts back into the original DataFrame
     filtered_df = pd.merge(filtered_df, country_counts, on='AssociatedModernCountry')
-    
+
     # working with latitude and longitude
     fig = px.choropleth_mapbox(filtered_df, geojson=geojson_data, locations='AssociatedModernCountry', featureidkey="properties.ADMIN",
                                color='Observation_Count', hover_data=['AssociatedModernCountry', 'Observation_Count'],
@@ -126,51 +195,88 @@ def update_map(year_range, clickData):
     return fig
 
 # ====================================SUNBURST==================================
-filtered_countries = []
-
+selected_countries = []
 @app.callback(
     Output('sunburst', 'figure'),
     [Input('choropleth-map', 'clickData'), 
-     Input('year-slider', 'value'),
-    Input('sunburst', 'clickData')]
+     Input('year-slider', 'value')]
 )
-
-def update_sunburst(clickData, year_range, clickData_sun):
-    global filtered_countries
-    # filtering based on year range
+def update_sunburst(clickData, year_range):  # maybe you're missing a filtered_df somewhere with the slicer?
+    global selected_countries
+    # filter based on year range
     filtered_df = df[(df['Birth year'] <= year_range[1]) & (df['Death year'] >= year_range[0])]
-        
+    
     if clickData is not None:
         clicked_country = clickData['points'][0]['location']
-            
-        # {'points': [{'curveNumber': 0, 'pointNumber': 0, 'currentPath': '/Arts and Entertainment/', 
-        #'root': '', 'entry': '', 'percentRoot': 0.2765957446808511, 'percentEntry': 0.2765957446808511, 
-        # 'percentParent': 1, 'parent': 'Arts and Entertainment', 'id': 'Arts and Entertainment/Artist', 
-        #'label': 'Artist', 'value': 13}]} 
     
-        if clicked_country not in filtered_countries:
-            filtered_countries.append(clicked_country)
+        if clicked_country not in selected_countries:
+            selected_countries.append(clicked_country)
         else:
-            filtered_countries.remove(clicked_country)
-    
-    # filtering data for the selected countries
-    if len(filtered_countries) > 0:
-        filtered_df = filtered_df[filtered_df['AssociatedModernCountry'].isin(filtered_countries)]
-        title = 'Occupation Distribution by Category in ' + ', '.join(filtered_countries)
+            selected_countries.remove(clicked_country)
+            
+            if len(selected_countries) == 0:
+                title = 'Occupation Distribution by Category in the World'
+                occupation_count = filtered_df.groupby(['Occupation categories', 'Occupation']).size().reset_index(name='count')
+                fig = px.sunburst(occupation_count,
+                                 path = ['Occupation categories', 'Occupation'], 
+                                  values = 'count',
+                                 title = title,
+                                 width = 800,
+                                 height = 800)
+                # fig.update_layout(title = 'Occupation Sunburst Plot')
+                return fig
+                
+        print(selected_countries, " + ", len(selected_countries))
+
+        # Filter data for the clicked country
+        filtered_df = filtered_df[(filtered_df['AssociatedModernCountry'].isin(selected_countries))]
+
+
+        occupation_count = filtered_df.groupby(['Occupation categories', 'Occupation']).size().reset_index(name='count')
+        
+        if len(selected_countries) > 0:
+            title = 'Occupation Distribution by Category in ' + ', '.join(selected_countries)
+        else:
+            title = 'Occupation Distribution by Category in the World'
+            
+        fig = px.sunburst(occupation_count,
+                         path = ['Occupation categories', 'Occupation'], 
+                          values = 'count',
+                         title = title,
+                         width = 800,
+                         height = 800)
+        # fig.update_layout(title = 'Occupation Sunburst Plot')
+        return fig
     else:
-        title = 'Occupation Distribution by Category in the World'
-        
-    occupation_count = filtered_df.groupby(['Occupation categories', 'Occupation']).size().reset_index(name='count')
-    fig = px.sunburst(
-        occupation_count,
-        path=['Occupation categories', 'Occupation'], 
-        values='count',
-        title=title,
-        width=800,
-        height=800
-    )
-    return fig
-        
+        if len(selected_countries) == 0:
+            title = 'Occupation Distribution by Category in the World'
+            occupation_count = filtered_df.groupby(['Occupation categories', 'Occupation']).size().reset_index(name='count')
+            fig = px.sunburst(occupation_count,
+                             path = ['Occupation categories', 'Occupation'], 
+                              values = 'count',
+                             title = title,
+                             width = 800,
+                             height = 800)
+            # fig.update_layout(title = 'Occupation Sunburst Plot')
+            return fig
+        else: 
+            filtered_df = filtered_df[(filtered_df['AssociatedModernCountry'].isin(selected_countries))]
+            occupation_count = filtered_df.groupby(['Occupation categories', 'Occupation']).size().reset_index(name='count')
+
+            if len(selected_countries) > 0:
+                title = 'Occupation Distribution by Category in ' + ', '.join(selected_countries)
+            else:
+                title = 'Occupation Distribution by Category in the World'
+
+            fig = px.sunburst(occupation_count,
+                             path = ['Occupation categories', 'Occupation'], 
+                              values = 'count',
+                             title = title,
+                             width = 800,
+                             height = 800)
+            # fig.update_layout(title = 'Occupation Sunburst Plot')
+            return fig
+
 # ====================================================================================
 
 # Callback to update the line plot based on slider range
