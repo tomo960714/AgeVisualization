@@ -178,7 +178,7 @@ state_button = dbc.Button(id='state-button', n_clicks=0, children='Born')
 ##
 eras_panel = dbc.Col([
     # add eras dropdown
-    html.P("Select the era"),
+    html.P("Select an era"),
     
     dcc.Dropdown(
         options=
