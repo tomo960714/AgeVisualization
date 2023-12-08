@@ -65,16 +65,53 @@ continents_countries = {continent: sorted(countries) for continent, countries in
 # add to list together
 country_list = sorted(world['continent'].unique().tolist()) + unique_country.tolist() 
 
+# add 'all' to the beginning country_list
+country_list.insert(0, 'All')
+
+
 #### Occupation ####
 # get unique Occupaion list
 unique_occupation = df['Occupation'].unique()
 unique_occupation.sort()
+# add 'all' to the beginning of the unique_occupation
+unique_occupation = np.insert(unique_occupation, 0, 'All')
 
 #### Gender ####
 # get gender list
 gender_list = sorted(df['Gender'].unique().tolist())
-# add 'all' to the gender_list
-gender_list.append('All')
+# add 'all' to the beginning of the gender list
+gender_list.insert(0, 'All')
+
+# create a dictionary of eras
+eras = {
+    'Viking Era': [793, 1066],
+    'Ancient Greece': [-800, 400],
+    'Maurya Empire': [-322,-185],
+    'Silk Road Establishment': [130,130],
+    'Roman Empire': [27,476],
+    'Great Wall of China': [700,1700],
+    'Mongol Empire': [1206,1368],
+    'Reneissance': [1300,1700],
+    'Age of Exploration': [1400,1700],
+    'Sengoku Period': [1400,1700],
+    'French Revolution': [1789,1799],
+    'Opium Wars': [1839,1860],
+    'Industrial Revolution': [1750,1850],
+    'Meiji Restoration': [1868,1868],
+    'Napoleonic Wars': [1789,1815],
+    'American Civil War': [1861,1865],
+    'World War I': [1914,1918],
+    'Interwar Period': [1918,1939],
+    'World War II': [1939,1945],
+    'Korean War': [1950,1953],
+    'Cold War': [1947,1991],
+    'Digital age': [1980,2021],
+    'Vietnam War': [1955,1975],
+    
+}
+
+# sort eras by start year
+eras = {era: start_year for era, start_year in sorted(eras.items(), key=lambda item: item[1])}
 
 
 
@@ -92,7 +129,7 @@ filters =html.Div([
         placeholder="Select options...",
         style={'width': '100%'}
     ),
-    html.Div(id='output-div-gender'),
+    html.Div(id='output-gender'),
     #html.Div(id='current-state-div', style={'margin-top': '10px'}),
     html.Hr(),
     html.P("Select the countries you want to compare"),
@@ -101,11 +138,11 @@ filters =html.Div([
         options=
             [{'label': continent, 'value': continent} for continent in country_list],
         multi=True,
-        id='dropdown-checklist',
+        id='dropdown-countries',
         placeholder="Select options...",
         style={'width': '100%'}
     ),
-    html.Div(id='output-country-div'),
+    html.Div(id='output-country'),
     html.Hr(),
     html.P("Select the occupation you want to compare"),
     # occupation dropdown
@@ -113,15 +150,39 @@ filters =html.Div([
         options=
             [{'label': occupation, 'value': occupation} for occupation in unique_occupation],
         multi=True,
-        id='dropdown-checklist-occupation',
+        id='dropdown-occupation',
         placeholder="Select options...",
         style={'width': '100%'}
         ),
-    html.Div(id='output-div-occupation'),
+    html.Div(id='output-occupation'),
     html.Hr(),
                         
     ], style={'width': '100%', 'margin': 'auto'})
 
+
+eras_panel = dbc.Col([
+    # add eras dropdown
+    html.P("Select the era"),
+    dcc.Dropdown(
+        options=
+            [{'label': era, 'value': era} for era in eras.keys()],
+        multi=False,
+        id='dropdown-era',
+        placeholder="Select options...",
+        style={'width': '60%'}
+        ),
+    html.Div(id='output-era'),
+
+    dcc.RangeSlider(
+        id='year-slider',
+        min=-1000,
+        max=2021,
+        value=[-1000, 2021],
+        marks={str(year): str(year) for year in range(-1000, 2021, 200)},
+        step=None
+    ),
+    dcc.Graph(id='line-plot')  # New line plot graph component
+], style={'width': '80%', 'margin': 'auto'})
 #}to here
 #generate the same app layout but with Bootstrap CSS and add a widget on the right so I can put my filters there in the future
 app.layout = dbc.Container([
@@ -134,20 +195,8 @@ app.layout = dbc.Container([
                 ])
             ], style={'width': '60%', 'margin': 'auto'}),
             dbc.Row([
-                dbc.Col([
-                    html.Button('1917-1921', id='button-1', n_clicks=0),
-                    html.Button('1939-1945', id='button-2', n_clicks=0),
-                    html.Button('1980-1985', id='button-3', n_clicks=0),
-                    dcc.RangeSlider(
-                        id='year-slider',
-                        min=-1000,
-                        max=2021,
-                        value=[-1000, 2021],
-                        marks={str(year): str(year) for year in range(-1000, 2021, 200)},
-                        step=None
-                    ),
-                    dcc.Graph(id='line-plot')  # New line plot graph component
-                ], style={'width': '80%', 'margin': 'auto'})
+                eras_panel
+                
             ], style={'width': '60%', 'margin': 'auto'}),       
         ]),
         #add a widget on the right so I can put my filters there in the future
@@ -166,7 +215,7 @@ app.layout = dbc.Container([
 #from{
 # callback for country dropdown checklist 
 @app.callback(
-    Output('output-country-div', 'children'),
+    Output('output-country', 'children'),
     #Input('dropdown-checklist', 'value')
 )
 def update_country_list(selected_options):
@@ -190,15 +239,22 @@ def update_country_list(selected_options):
         #return f'Selected options: {", ".join(selected_options)}'
         return selected_options
     else:
-        return 'No options selected'
+        # if no options selected, return all countries
+        selected_options = unique_country
+        # remove all from selected options
+        selected_options.lower().remove('all')
+
+
+        return selected_options
 
 # callback for occupation dropdown checklist
 
 @app.callback(
-    Output('output-div-occupation', 'children'),
-    Input('dropdown-checklist-occupation', 'value')
+    Output('output-occupation', 'children'),
+    Input('dropdown-occupation', 'value')
 )
 def update_occupation_list(selected_options):
+    # if selected_options does not have all
     if selected_options:
         # remove duplicates in selected options
         selected_options = list(set(selected_options))
@@ -207,13 +263,49 @@ def update_occupation_list(selected_options):
         #return f'Selected options: {", ".join(selected_options)}'
         return selected_options
     else:
-        return 'No options selected'
+        selected_options = unique_occupation
+        # remove all from selected options
+        selected_options.lower().remove('all')
 
+        return selected_options
+    
 # gender callback
 @app.callback(
-    Output('output-gender-div', 'children'),
+    Output('output-gender', 'children'),
+    Input('dropdown-gender', 'value')
 )
-#}to here
+def update_gender(selected_options):
+    # if selected_options does not have all
+    if selected_options:
+        # remove duplicates in selected options
+        selected_options = list(set(selected_options))
+        # sort selected options
+        selected_options.sort()
+        #return f'Selected options: {", ".join(selected_options)}'
+        return selected_options
+    else:
+        selected_options = gender_list
+        # remove all from selected options
+        selected_options.lower().remove('all')
+
+        return selected_options
+
+@app.callback(
+    [Output('output-era', 'children'),
+    Output('choropleth-map', 'figure')],
+    Input('dropdown-era', 'value')
+)
+
+def update_era(selected_option):
+    if selected_option:
+        # get the values from eras dictionary
+        year_range = eras[selected_option]
+    return update_map(year_range)
+
+
+
+
+
 
 @app.callback(
     Output('year-slider', 'value'),
