@@ -159,10 +159,27 @@ filters =html.Div([
                         
     ], style={'width': '100%', 'margin': 'auto'})
 
+year_select_boxes = html.Div(
+    [
+        dbc.Input(id="year_select_min",  type="number", min = df['Birth year'].min(), max = 2023, step=1),
+        dbc.Input(id="year_select_max",  type="number", min = df['Birth year'].min(), max = 2023, step=1),
+        html.Br(),
+        html.P(id="output_min"),
+        html.P(id="output_max"),
+    ]
+)
 
+# create a button for born/died/alive and change the button title based on the callback
+
+state_button = dbc.Button(id='state-button', n_clicks=0, children='Born')
+
+
+
+##
 eras_panel = dbc.Col([
     # add eras dropdown
     html.P("Select the era"),
+    
     dcc.Dropdown(
         options=
             [{'label': era, 'value': era} for era in eras.keys()],
@@ -181,8 +198,13 @@ eras_panel = dbc.Col([
         marks={str(year): str(year) for year in range(-1000, 2021, 200)},
         step=None
     ),
+    year_select_boxes,
     dcc.Graph(id='line-plot')  # New line plot graph component
 ], style={'width': '80%', 'margin': 'auto'})
+
+
+
+
 #}to here
 #generate the same app layout but with Bootstrap CSS and add a widget on the right so I can put my filters there in the future
 app.layout = dbc.Container([
@@ -190,13 +212,12 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Row([
                 dbc.Col([
-                    dcc.Graph(id='choropleth-map', style={'width': '70%', 'display': 'inline-block'}),
-                    dcc.Graph(id='bar-plot', style={'width': '30%', 'display': 'inline-block'})
+#dcc.Graph(id='choropleth-map', style={'width': '70%', 'display': 'inline-block'}),
+#                   dcc.Graph(id='bar-plot', style={'width': '30%', 'display': 'inline-block'})
                 ])
             ], style={'width': '60%', 'margin': 'auto'}),
             dbc.Row([
-                eras_panel
-                
+                eras_panel,
             ], style={'width': '60%', 'margin': 'auto'}),       
         ]),
         #add a widget on the right so I can put my filters there in the future
@@ -290,7 +311,11 @@ def update_gender(selected_options):
 
         return selected_options
 
-@app.callback(
+
+
+
+# eras callback
+"""@app.callback(
     [Output('output-era', 'children'),
     Output('choropleth-map', 'figure')],
     Input('dropdown-era', 'value')
@@ -301,12 +326,57 @@ def update_era(selected_option):
         # get the values from eras dictionary
         year_range = eras[selected_option]
     return update_map(year_range)
+"""
+"""
+# eras callback with object store
+@app.callback(
+    [Output('output-era', 'children'),
+    Output('object-store_year_min', 'data'),
+    Output('object-store_year_max', 'data')],
+    Input('dropdown-era', 'value')
+)
+
+def update_era(selected_option):
+    if selected_option:
+        # get the values from eras dictionary
+        year_range = eras[selected_option]
+        return selected_option, year_range[0], year_range[1]
+    else:
+        return dash.no_update, dash.no_update, dash.no_update
+    
+# year select box callback
+@app.callback(
+    [Output("year_select_min", "value"),
+    Output("year_select_max", "value")],
+    [Input("object-store_year_min", "data"),
+        Input("object-store_year_max", "data")],
+)
+def update_output_min(value_min, value_max):
+    if value_min is None:
+        value_min = df['Birth year'].min()
+    if value_max is None:
+        value_max = 2023
+    if value_min > value_max:
+        value_min = value_max
+    if value_max < value_min:
+        value_max = value_min
+    return value_min, value_max
+
+# change the year select box when the era is selected
+@app.callback(
+    [Output("year_select_min", "value"),
+    Output("year_select_max", "value")],
+    [Input("object-store_year_min", "data"),
+        Input("object-store_year_max", "data"),
+        Input("dropdown-era", "value")],
+)
+"""
+
+# create callback for the era selection and the year box in a way, that if the era is selected, the year box will be updated
 
 
 
-
-
-
+"""
 @app.callback(
     Output('year-slider', 'value'),
     [Input('button-1', 'n_clicks'),
@@ -323,7 +393,7 @@ def update_slider(button_1, button_2, button_3):
         return [1980, 1985]
     else:
         return [df['Birth year'].min(), df['Birth year'].max()]
-
+"""
 # Callback to update the choropleth map based on slider and button clicks
 @app.callback(
     Output('choropleth-map', 'figure'),
