@@ -82,6 +82,38 @@ gender_list = sorted(df['Gender'].unique().tolist())
 # add 'all' to the beginning of the gender list
 gender_list.insert(0, 'All')
 
+# create a dictionary of eras
+eras = {
+    'Viking Era': [793, 1066],
+    'Ancient Greece': [-800, 400],
+    'Maurya Empire': [-322,-185],
+    'Silk Road Establishment': [130,130],
+    'Roman Empire': [27,476],
+    'Great Wall of China': [700,1700],
+    'Mongol Empire': [1206,1368],
+    'Reneissance': [1300,1700],
+    'Age of Exploration': [1400,1700],
+    'Sengoku Period': [1400,1700],
+    'French Revolution': [1789,1799],
+    'Opium Wars': [1839,1860],
+    'Industrial Revolution': [1750,1850],
+    'Meiji Restoration': [1868,1868],
+    'Napoleonic Wars': [1789,1815],
+    'American Civil War': [1861,1865],
+    'World War I': [1914,1918],
+    'Interwar Period': [1918,1939],
+    'World War II': [1939,1945],
+    'Korean War': [1950,1953],
+    'Cold War': [1947,1991],
+    'Digital age': [1980,2021],
+    'Vietnam War': [1955,1975],
+    
+}
+
+# sort eras by start year
+eras = {era: start_year for era, start_year in sorted(eras.items(), key=lambda item: item[1])}
+
+
 
 filters =html.Div([
     html.H2("Filters"),
@@ -127,6 +159,30 @@ filters =html.Div([
                         
     ], style={'width': '100%', 'margin': 'auto'})
 
+
+eras_panel = dbc.Col([
+    # add eras dropdown
+    html.P("Select the era"),
+    dcc.Dropdown(
+        options=
+            [{'label': era, 'value': era} for era in eras.keys()],
+        multi=False,
+        id='dropdown-era',
+        placeholder="Select options...",
+        style={'width': '60%'}
+        ),
+    html.Div(id='output-era'),
+
+    dcc.RangeSlider(
+        id='year-slider',
+        min=-1000,
+        max=2021,
+        value=[-1000, 2021],
+        marks={str(year): str(year) for year in range(-1000, 2021, 200)},
+        step=None
+    ),
+    dcc.Graph(id='line-plot')  # New line plot graph component
+], style={'width': '80%', 'margin': 'auto'})
 #}to here
 #generate the same app layout but with Bootstrap CSS and add a widget on the right so I can put my filters there in the future
 app.layout = dbc.Container([
@@ -139,20 +195,8 @@ app.layout = dbc.Container([
                 ])
             ], style={'width': '60%', 'margin': 'auto'}),
             dbc.Row([
-                dbc.Col([
-                    html.Button('1917-1921', id='button-1', n_clicks=0),
-                    html.Button('1939-1945', id='button-2', n_clicks=0),
-                    html.Button('1980-1985', id='button-3', n_clicks=0),
-                    dcc.RangeSlider(
-                        id='year-slider',
-                        min=-1000,
-                        max=2021,
-                        value=[-1000, 2021],
-                        marks={str(year): str(year) for year in range(-1000, 2021, 200)},
-                        step=None
-                    ),
-                    dcc.Graph(id='line-plot')  # New line plot graph component
-                ], style={'width': '80%', 'margin': 'auto'})
+                eras_panel
+                
             ], style={'width': '60%', 'margin': 'auto'}),       
         ]),
         #add a widget on the right so I can put my filters there in the future
@@ -245,6 +289,22 @@ def update_gender(selected_options):
         selected_options.lower().remove('all')
 
         return selected_options
+
+@app.callback(
+    [Output('output-era', 'children'),
+    Output('choropleth-map', 'figure')],
+    Input('dropdown-era', 'value')
+)
+
+def update_era(selected_option):
+    if selected_option:
+        # get the values from eras dictionary
+        year_range = eras[selected_option]
+    return update_map(year_range)
+
+
+
+
 
 
 @app.callback(
