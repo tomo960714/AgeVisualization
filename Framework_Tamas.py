@@ -214,6 +214,8 @@ app.layout = dbc.Container([
                 dbc.Col([
 #dcc.Graph(id='choropleth-map', style={'width': '70%', 'display': 'inline-block'}),
 #                   dcc.Graph(id='bar-plot', style={'width': '30%', 'display': 'inline-block'})
+                dcc.Store(id='store_map', storage_type='memory'),
+
                 ])
             ], style={'width': '60%', 'margin': 'auto'}),
             dbc.Row([
@@ -234,6 +236,61 @@ app.layout = dbc.Container([
     ], style={'width': '100%', 'margin': 'auto'}, fluid=True)
 
 #from{
+
+
+# callback for country dropdown checklist to update the store_map
+@app.callback(
+    Output('store_map', 'data'),
+    Input('dropdown-countries', 'value')
+)
+def update_store_map(selected_options):
+    if selected_options:
+        # check if selected options has continents
+        continents = [option for option in selected_options if option in continents_countries.keys()]
+        # check if selected options has countries
+        countries = [option for option in selected_options if option in continents_countries.values()]
+        # if continents are selected, add all countries in the continent to the selected options
+        if continents:
+            for continent in continents:
+                selected_options.extend(continents_countries[continent])
+        # if countries are selected, add all continents of the countries to the selected options
+        if countries:
+            for country in countries:
+                selected_options.extend(world[world['name'] == country]['continent'].tolist())
+        # remove duplicates in selected options
+        selected_options = list(set(selected_options))
+        # sort selected options
+        selected_options.sort()
+        #return f'Selected options: {", ".join(selected_options)}'
+        return selected_options
+    else:
+        # if no options selected, return all countries
+        selected_options = unique_country
+        # remove all from selected options
+        selected_options.lower().remove('all')
+
+
+        return selected_options
+    
+#callback for the choropleth map to save selected countries to the store_map
+@app.callback(
+    Output('store_map', 'data'),
+    Input('choropleth-map', 'clickData')
+)
+def update_store_map(clickData):
+    if clickData is not None:
+        clicked_country = clickData['points'][0]['location']
+        #print(clicked_country)
+        return clicked_country
+    else:
+        return dash.no_update
+    
+
+
+
+
+
+
 # callback for country dropdown checklist 
 @app.callback(
     Output('output-country', 'children'),
