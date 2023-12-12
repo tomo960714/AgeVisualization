@@ -1,45 +1,38 @@
 import pandas as pd
 
-def create_country_year_dict(df, country, year):
-    """
-    Create a dictionary for a specific country and year with the number of births and deaths.
-    :param df: DataFrame containing the data.
-    :param country: The country to filter the data by.
-    :param year: The year to get the data for.
-    :return: A dictionary in the format {'country name': ['year', 'number of births in year', 'number of deaths in year']}
-    """
-
-    # Filtering data for the given country
-    country_df = df[df["AssociatedModernCountry"] == country]
-
-    # Getting the number of births and deaths in the given year
-    births_in_year = country_df[country_df["Birth year"] == year].shape[0]
-    deaths_in_year = country_df[country_df["Death year"] == year].shape[0]
-
-    return {country: [year, births_in_year, deaths_in_year]}
-
 # Load the dataset
 file_path = 'TheAgeDatasetV5.csv'
-df = pd.read_csv(file_path)
+age_data = pd.read_csv(file_path)
 
-# Extracting the unique country names
-unique_countries = df['Country'].unique().tolist()
+# Determine the range of years to consider
+min_year = age_data['Birth year'].min()
+max_year = age_data['Death year'].max()
 
-# Extract unique years from 'Birth year' and 'Death year' columns
-unique_birth_years = set(df['Birth year'].unique())
-unique_death_years = set(df['Death year'].unique())
+# Initialize a dictionary to hold the counts for each country
+country_counts = {}
 
-# Combine both sets to get all unique years
-all_unique_years = unique_birth_years.union(unique_death_years)
+# Iterate through each year in the range
+for year in range(min_year, max_year + 1):
+    # Filter the dataset to find individuals who were alive in that year
+    alive_people = age_data[(age_data['Birth year'] <= year) & (age_data['Death year'] >= year)]
 
-# Convert to a sorted list (optional)
-sorted_years = sorted(all_unique_years)
+    # Count the number of alive people for each country in this year
+    counts_by_country = alive_people['AssociatedModernCountry'].value_counts().to_dict()
 
-# Creating a list of tuples for each country and year combination
-countries_and_years = [(country, year) for country in unique_countries for year in sorted_years]
+    # Update the main dictionary with the counts for this year
+    for country, count in counts_by_country.items():
+        if country not in country_counts:
+            country_counts[country] = []
+        country_counts[country].append(count)
 
-# Loop through each country and year, create and print the dictionary
-for country, year in countries_and_years:
-    country_year_dict = create_country_year_dict(df, country, year)
-    print(country_year_dict)
+# Create a list of years for reference
+years = list(range(min_year, max_year + 1))
 
+# Display the years
+print("Years:", years)
+
+# Display the counts for each country
+for country, counts in country_counts.items():
+    print(f"\n{country}:")
+    print("Years: ", years)
+    print("Counts:", counts)
