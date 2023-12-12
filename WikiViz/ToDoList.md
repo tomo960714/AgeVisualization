@@ -1,11 +1,11 @@
 # Still To-do 
 -  change box-whisker adaption colormap  &#9745;
 - find a way to keep colors of sunburst catagories constant &#9745;
-- set the right colors for sunburst in colormap &#9745
+- set the right colors for sunburst in colormap &#9745;
 - make overall dashboard prettier
-- get filters over to the side &#9745
+- get filters over to the side &#9745;
 - make layout prettier 
-- change year slider to have smaller increments
+- change year slider to have smaller increments &#9745;
 - get linechart working &#9745;
 - get filters working &#9745;
 - fix bug with occupation selection (others and unspecificed) &#9745;
@@ -16,13 +16,13 @@
 - be able to select category &#9745;
 - add percentages to sunburst occupations 
 - be able to select continents in filter &#9745;
-- cut year range from 0 to 2021 instead?
+- cut year range from 0 to 2021 instead? 
 - reduce number of countries in the lookup
 - add more Occupations to catagories? 
-- stick tiles to roof of screen
-- bar chart (occupations)
+- stick tiles to roof of screen 
+- bar chart (occupations) 
 - Sans-serif font for everything
-- slider needs work
+- slider needs work &#9745;
 - make choropleth green
 - bootstrap theme
 - prettier tile cards
