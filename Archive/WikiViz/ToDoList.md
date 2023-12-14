@@ -1,0 +1,35 @@
+# Still To-do 
+-  change box-whisker adaption colormap  &#9745;
+- find a way to keep colors of sunburst catagories constant &#9745;
+- set the right colors for sunburst in colormap &#9745;
+- make overall dashboard prettier
+- get filters over to the side &#9745;
+- make layout prettier 
+- change year slider to have smaller increments &#9745;
+- get linechart working &#9745;
+- get filters working &#9745;
+- fix bug with occupation selection (others and unspecificed) &#9745;
+- add more tiles with statistics
+- add correct titles to charts, indicating that its people living in a given period (Choropleth not displaying title)
+- add descriptions to charts 
+- add overall title and description of visualization
+- be able to select category &#9745;
+- add percentages to sunburst occupations 
+- be able to select continents in filter &#9745;
+- cut year range from 0 to 2021 instead? 
+- reduce number of countries in the lookup
+- add more Occupations to catagories? 
+- stick tiles to roof of screen 
+- bar chart (occupations) 
+- Sans-serif font for everything
+- slider needs work &#9745;
+- make choropleth green
+- bootstrap theme
+- prettier tile cards
+- titles (needs to be done when we know fixed sizes of charts)
+- count of alive individuals to line chart
+
+Optional
+- mosaic button for sunburst
+- mosaic for individuals (tooltips hover should be name + description)
+- figure out multiple occupations
