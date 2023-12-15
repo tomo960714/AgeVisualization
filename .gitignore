@@ -168,3 +168,10 @@ cython_debug/
 #.idea/
 Data/AgesDatasetV4.csv
 Data/AgeDataset-V1.csv
+*.mp4
+*.zip
+*.ini
+Video/Adobe Premiere Pro Auto-Save/DataVis-2023-12-15_00-58-04.prproj
+Video/Adobe Premiere Pro Auto-Save/DataVis-2023-12-15_01-23-06.prproj
+Video/Adobe Premiere Pro Auto-Save/DataVis.prproj
+Video/DataVis.prproj
