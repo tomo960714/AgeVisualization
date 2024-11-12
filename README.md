@@ -1,5 +1,5 @@
 # AgeVisualization
-Final assignment for Data Visualization using PowerBI and python for data preprocessing.
+Final assignment for Data Visualization using dash and plotly.
 
 Use the following code to create conda environment called `DataVis_env` with all the required dependencies:
 
